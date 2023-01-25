@@ -1,4 +1,5 @@
 const canvas  = document.querySelector("#game");
+const iniGame  = document.querySelector("#IniGame");
 const game = canvas.getContext("2d");
 
 
@@ -7,6 +8,7 @@ const btnUp = document.querySelector("#up");
 const btnDown = document.querySelector("#down");
 const btnRight = document.querySelector("#right");
 const btnLeft = document.querySelector("#left");
+const begin = document.querySelector("#begin");
 
 
 window.addEventListener('load', setCanvasSize);
@@ -50,9 +52,8 @@ function startGame(){
    showLives();
    if(!time){
     timeInterval= setInterval( makeTime, 100);
-    const record = document.querySelector("#record");
-    record.textContent = localStorage.getItem("record");
    }
+   showRecord();
    
     //determino mi unidad dentro del canvas
     elementSize = canvasSize /10 -1;
@@ -167,6 +168,9 @@ function movePlayer(){
  * Funcion  que genera el lienzo del canvas
  */
 function setCanvasSize(  ){
+
+    canvas.style.display = "block";
+    iniGame.style.display = "none";
     if(window-innerHeight > window.innerWidth){
         canvasSize = window.innerWidth;
     }else{
@@ -176,6 +180,9 @@ function setCanvasSize(  ){
     canvasSize.toFixed(0);
     canvas.setAttribute('width', canvasSize);
     canvas.setAttribute('height', canvasSize);
+
+    iniGame.style.width =  canvasSize + "px";
+    iniGame.style.height =  canvasSize  + "px";
 
     playerPosition.x = playerPosition.y = undefined;
     startGame();
@@ -190,11 +197,22 @@ function levelWin(){
         
         clearInterval( timeInterval);
         let timeOld = localStorage.getItem("record");
+
+        const resultado = document.querySelector("#resultado");
         if(!timeOld  ||  time < timeOld ){
             localStorage.setItem("record", time);
-
+            resultado.textContent  = "Ha batido un nuevo record";
+        }else{
+            resultado.textContent  = "No ha podido batir el record";
         }
-       
+        showRecord();
+
+        //reinicio del juego
+        canvas.style.display = "none";
+        iniGame.style.display = "block";
+        level =0;
+        time =0;
+
         return;
     }
 }
@@ -259,11 +277,18 @@ function checkMove(ev){
     }
 }
 
+function showRecord(){
+    const record = document.querySelector("#record");
+    record.textContent = localStorage.getItem("record");
+}
+
 btnUp.addEventListener('click', moveEvents.moveUp);
 btnDown.addEventListener('click', moveEvents.moveDown);
 btnLeft.addEventListener('click', moveEvents.moveLeft);
 btnRight.addEventListener('click', moveEvents.moveRight);
 window.addEventListener('keydown', checkMove);
+begin.addEventListener('click', setCanvasSize);
+
 
 
 
