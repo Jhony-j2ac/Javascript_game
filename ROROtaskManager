@@ -1,0 +1,97 @@
+export function createTaskPlanner() {
+  return new TaskPlanner();
+}
+
+class TaskPlanner {
+  tasks = [];
+  addTask(task = {
+    id,
+    name,
+    priority,
+    tags
+  }) {
+
+    let newTask = { ...task };
+
+    newTask.completed = false;
+    this.tasks.push(newTask);
+  }
+
+  removeTask(needle) {
+
+    let task = this.getTasks({
+      needle
+    });
+    if (task >= 0) {
+      this.tasks.splice(task,1);
+    }
+
+  }
+
+  getTasks(params = {
+    completed: undefined,
+    order: undefined,
+    tag: undefined,
+    needle: undefined
+  }) { 
+    switch (true) {
+      case params.completed === true:
+        return this.tasks.filter(task => task.completed);
+        break;
+      case params.order != undefined && params.order != "": 
+        let tasksOrdered = [ ...this.tasks ];
+        return tasksOrdered.sort((a, b) => a[params.order] - b[params.order])
+        break;
+      case typeof params.tag === "string" && params.tag.length != "":
+        return this.tasks.filter(task =>
+          task.tags.some(tag => tag === params.tag)
+        );
+        break;
+      case typeof params.needle === "number" || (typeof params.needle === "string" && params.needle != ""):
+        return this.tasks.findIndex((value) => {
+          return value.id == params.needle || value.name === params.needle;
+        });
+        break;
+      default:
+        return this.tasks;
+        break;
+    }
+
+  }
+  getCompletedTasks() {
+    return this.getTasks({
+      completed: true
+    });
+  }
+
+  getSortedTasksByPriority() {
+    return this.getTasks({
+      order: "priority"
+    });
+  }
+
+  filterTasksByTag(tag) {
+    return this.getTasks({
+      tag: tag
+    });
+  }
+  markTaskAsCompleted(needle) {
+    let task = this.getTasks({
+      needle
+    });
+
+    if (task >= 0) {
+
+      this.tasks[task].completed = true;
+      return this.tasks;
+    }
+  }
+
+  updateTask(taskId, updates) {
+    let task = this.getTasks({
+      needle: taskId
+    });
+    let newTask = { ...this.tasks[task], ...updates };
+    this.tasks.splice(task, 1, newTask);
+  }
+}
